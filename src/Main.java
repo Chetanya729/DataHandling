@@ -7,6 +7,7 @@ void main() {
         List<Employee> employees = loadEmployees();
 //        basicspractice();
         matchingAndFinding(employees);
+        primitiveStreams(employees);
 }
 
 private List<Employee> loadEmployees() {
@@ -173,4 +174,47 @@ void printEmployees(List<Employee> rows) {
                 e.age(), e.department(), e.jobRole(), e.monthlyIncome(), e.attrition(),
                 e.gender(), e.Education_Field(), e.BusinessTravel()));
         System.out.printf("%n%d employees listed.%n", rows.size());
+}
+void primitiveStreams(List<Employee> employees){
+        System.out.println("New List of Data:\n 1.Total monthly payroll\n 2.Average age\n 3.Income Statistics\n 4.How many employees per department\n 5.Head count per job role\n 6.Average income per department\n 7.Total payroll per department\n 8.Count of gender in particular department\n");
+        Scanner scanner = new Scanner(System.in);
+        int choice = scanner.nextInt();
+        switch (choice) {
+                case 1:
+                        long totalMonthlyPayroll = employees.stream().mapToInt(Employee::monthlyIncome).sum();
+                        System.out.println("Total monthly payroll is: " + totalMonthlyPayroll);
+                        break;
+                case 2:
+                        OptionalDouble averageAge = employees.stream().mapToInt(Employee::age).average();
+                        averageAge.ifPresent(System.out::println);
+                        break;
+                case 3:
+                        IntSummaryStatistics statistics = employees.stream().mapToInt(Employee::monthlyIncome).summaryStatistics();
+                        System.out.println("Average monthly payroll is: " + statistics);
+                        break;
+                case 4:
+                        Map<String,Long> employeesInDepartment = employees.stream().collect(Collectors.groupingBy(Employee::department, Collectors.counting()));
+                        System.out.println("Employees according to department\n"+employeesInDepartment);
+                        break;
+                case 5:
+                        Map<String,Long> accordingTojobRole = employees.stream().collect(Collectors.groupingBy(Employee::jobRole, Collectors.counting()));
+                        System.out.println("Employees according to job role\n"+accordingTojobRole);
+                        break;
+                case 6:
+                        Map<String,Double> averageAccordingToDepartment = employees.stream().collect(Collectors.groupingBy(Employee::department, Collectors.averagingDouble(Employee::monthlyIncome)));
+                        System.out.println("Average income according to department\n"+averageAccordingToDepartment);
+                        break;
+                case 7:
+                        Map<String ,Integer> totalPayDepartment = employees.stream().collect(Collectors.groupingBy(Employee::department, Collectors.summingInt(Employee::monthlyIncome)));
+                        System.out.println("Total pay department\n"+totalPayDepartment);
+                        break;
+                case 8:
+                        Map<String, Map<String, Long>> departmentGender = employees.stream().collect(Collectors.groupingBy(Employee::department,Collectors.groupingBy(Employee::gender,Collectors.counting())));
+                        System.out.println("Gender count per department\n"+departmentGender);
+                        break;
+                        default:
+                                System.out.println("Invalid option");
+
+
+        }
 }
